@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jasper Koh Portfolio</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D1015'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-size='30' font-style='italic' fill='%23E3A857'%3EJK%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Jasper Koh: Computer Science and Business Administration student and published researcher.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: an academic CV set like a journal page. Serif display, mono metadata,
+   a live citation-graph behind the whole page, and a left index rail on wide screens. */
+:root {
+  /* Light palette (opt-in) */
+  --bg: #F4F2EC;
+  --surface: #FFFFFF;
+  --ink: #16191F;
+  --muted: #5B606B;
+  --line: #DAD6CC;
+  --accent: #9C5A12;
+  --accent-soft: rgba(156, 90, 18, 0.10);
+  --good: #2F7A4F;
+  --good-soft: rgba(47, 122, 79, 0.12);
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+  --max: 1120px;
+  color-scheme: light;
+}
+/* Dark palette is the default; light only when the toggle sets data-theme="light" */
+:root:not([data-theme="light"]) {
+  --bg: #0D1015;
+  --surface: #141920;
+  --ink: #E9E6DE;
+  --muted: #959AA5;
+  --line: #252C36;
+  --accent: #E3A857;
+  --accent-soft: rgba(227, 168, 87, 0.12);
+  --good: #7CC79A;
+  --good-soft: rgba(124, 199, 154, 0.12);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .45s ease, color .45s ease;
+}
+a { color: inherit; }
+img { max-width: 100%; }
+h1, h2, h3 { text-wrap: balance; font-weight: 400; margin: 0; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 clamp(16px, 4vw, 40px); }
+.mono { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.02em; }
+
+/* ---------- Nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .3s ease, background-color .45s ease;
+}
+.nav.scrolled { border-bottom-color: var(--line); }
+.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+.brand { white-space: nowrap; font-family: var(--font-display); font-size: 1.5rem; text-decoration: none; letter-spacing: -0.01em; }
+.brand span { color: var(--accent); font-style: italic; }
+.nav-links { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+.nav-links a {
+  text-decoration: none; color: var(--muted); font-size: 0.92rem; position: relative; padding: 4px 0;
+  transition: color .2s ease;
+}
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 1px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left; transition: transform .3s ease;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+.nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+.icon-btn {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+  transition: border-color .2s ease, transform .2s ease;
+}
+.icon-btn:hover { border-color: var(--accent); }
+.icon-btn:active { transform: scale(0.94); }
+.icon-btn svg { width: 18px; height: 18px; }
+.theme-toggle .sun, .theme-toggle .moon { transition: transform .5s cubic-bezier(.5,1.6,.4,1), opacity .3s ease; transform-origin: center; }
+:root:not([data-theme="light"]) .theme-toggle .sun { opacity: 0; transform: rotate(-90deg) scale(.4); }
+:root[data-theme="light"] .theme-toggle .moon { opacity: 0; transform: rotate(90deg) scale(.4); }
+.theme-toggle svg { grid-area: 1 / 1; }
+.menu-btn { display: none; }
+
+@media (max-width: 1024px) {
+  .menu-btn { display: grid; }
+  .nav-links {
+    position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; gap: 0;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: 8px clamp(16px, 4vw, 40px) 16px;
+    display: none;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { display: block; padding: 12px 0; font-size: 1rem; }
+}
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+#graph { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; z-index: 0; pointer-events: none; opacity: 0.85; }
+.hero, main, footer { position: relative; z-index: 1; }
+.hero .wrap { position: relative; z-index: 1; padding-top: clamp(72px, 12vw, 132px); padding-bottom: clamp(64px, 10vw, 112px); }
+.eyebrow { color: var(--accent); display: inline-flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; }
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 9vw, 7.2rem);
+  line-height: 0.95; letter-spacing: -0.025em;
+  margin: 22px 0 26px;
+}
+.hero h1 em { color: var(--accent); }
+.hero h1 .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+.hero h1 .line > span { display: inline-block; }
+.lede { max-width: 58ch; color: var(--muted); font-size: 1.15rem; }
+.lede strong { color: var(--ink); font-weight: 500; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 20px; border-radius: 999px; text-decoration: none; font-weight: 500; font-size: 0.95rem;
+  border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, background-color .2s ease, color .2s ease;
+}
+.btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.btn.primary:hover { background: transparent; color: var(--accent); }
+.btn .arrow { transition: transform .2s ease; }
+.btn:hover .arrow { transform: translateX(3px); }
+
+.stats {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+  margin-top: clamp(56px, 8vw, 88px); border-top: 1px solid var(--line);
+  max-width: 760px;
+}
+.stat { padding: 18px 18px 0 0; min-width: 0; overflow-wrap: break-word; }
+.stat + .stat { padding-left: 18px; border-left: 1px solid var(--line); }
+.stat b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 2.4rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); display: block; margin-top: 6px; line-height: 1.4; }
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { border-left: 0; padding-left: 0; }
+}
+
+/* ---------- Sections ---------- */
+section.block { padding: clamp(72px, 10vw, 120px) 0; border-bottom: 1px solid var(--line); }
+.section-head { display: grid; grid-template-columns: 200px 1fr; gap: 24px; align-items: baseline; margin-bottom: 48px; }
+.section-head .mono { color: var(--muted); }
+.section-head h2 { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.05; letter-spacing: -0.015em; }
+.section-body { display: grid; grid-template-columns: 200px 1fr; gap: 24px; }
+.section-body > :first-child { grid-column: 2; }
+@media (max-width: 760px) {
+  .section-head, .section-body { grid-template-columns: 1fr; gap: 10px; }
+  .section-body > :first-child { grid-column: 1; }
+}
+
+/* About */
+.about-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: clamp(28px, 5vw, 64px); }
+.about-grid p + p { margin-top: 1em; }
+.about-grid .prose { max-width: 62ch; }
+.dual { display: grid; gap: 14px; align-content: start; }
+.dual-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: var(--surface); transition: border-color .25s ease, transform .25s ease, background-color .45s ease; }
+.dual-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.dual-card h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 6px; }
+.dual-card p { color: var(--muted); font-size: 0.95rem; }
+.dual-card .mono { color: var(--accent); display: block; margin-bottom: 8px; }
+@media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+
+/* Publications */
+.pubs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: pub; }
+.pub {
+  position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 20px;
+  padding: 28px 0; border-top: 1px solid var(--line);
+}
+.pub:last-child { border-bottom: 1px solid var(--line); }
+.pub::before {
+  counter-increment: pub; content: "[" counter(pub) "]";
+  font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; padding-top: 6px;
+}
+.pub::after {
+  content: ""; position: absolute; left: 0; top: -1px; height: 1px; width: 100%; background: var(--accent);
+  transform: scaleX(0); transform-origin: left; transition: transform .5s ease;
+}
+.pub:hover::after { transform: scaleX(1); }
+.pub-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+.chip {
+  font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;
+}
+.chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.chip.published { color: var(--good); background: var(--good-soft); }
+.chip.press { color: var(--accent); background: var(--accent-soft); }
+.chip.press::before { animation: pulse 1.8s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+.pub h3 { font-family: var(--font-display); font-size: clamp(1.45rem, 2.6vw, 1.9rem); line-height: 1.2; margin-bottom: 8px; }
+.pub .authors { color: var(--muted); }
+.pub .authors b { color: var(--ink); font-weight: 600; }
+.pub .venue { font-style: italic; color: var(--muted); }
+.pub .abstract { margin-top: 12px; max-width: 68ch; font-size: 0.97rem; }
+.pub-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.link-btn {
+  font-family: var(--font-mono); font-size: 0.78rem; text-decoration: none;
+  padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--ink); cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+.link-btn:hover { border-color: var(--accent); color: var(--accent); }
+.bib {
+  display: none; margin-top: 14px; padding: 16px; border-radius: 8px; background: var(--surface);
+  border: 1px solid var(--line); overflow-x: auto; font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.55; color: var(--muted);
+}
+.bib.open { display: block; animation: drop .35s ease; }
+@keyframes drop { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 560px) { .pub { grid-template-columns: 1fr; gap: 6px; } .pub::before { padding-top: 0; } }
+
+/* Experience timeline */
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+.timeline::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
+.tl-item { position: relative; padding: 0 0 40px 36px; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-item::before {
+  content: ""; position: absolute; left: 0; top: 7px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--accent); transition: background-color .3s ease, transform .3s ease;
+}
+.tl-item:hover::before { background: var(--accent); transform: scale(1.2); }
+.tl-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; align-items: baseline; }
+.tl-head h3 { font-family: var(--font-display); font-size: 1.6rem; }
+.tl-head .mono { color: var(--muted); font-variant-numeric: tabular-nums; }
+.tl-org { color: var(--accent); font-weight: 500; margin: 2px 0 10px; }
+.tl-item ul { margin: 0; padding-left: 18px; color: var(--muted); max-width: 68ch; }
+.tl-item li + li { margin-top: 4px; }
+
+/* Projects */
+.projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.project {
+  position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  text-decoration: none; overflow: hidden;
+  transition: transform .3s ease, border-color .3s ease, background-color .45s ease;
+}
+.project::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), var(--accent-soft), transparent 60%);
+  transition: opacity .3s ease;
+}
+.project:hover { transform: translateY(-4px); border-color: var(--accent); }
+.project:hover::before { opacity: 1; }
+.project .mono { color: var(--accent); }
+.project h3 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; }
+.project p { color: var(--muted); font-size: 0.95rem; flex: 1; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; }
+
+/* Skills */
+.skills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+.skills h3 { font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 14px; }
+.skills ul { list-style: none; margin: 0; padding: 0; }
+.skills li { padding: 9px 0; border-bottom: 1px solid var(--line); transition: padding-left .25s ease, color .25s ease; }
+.skills li:hover { padding-left: 8px; color: var(--accent); }
+
+
+/* Contact */
+.contact h2 { font-family: var(--font-display); font-size: clamp(2.6rem, 7vw, 5rem); line-height: 1; letter-spacing: -0.02em; max-width: 14ch; }
+.contact h2 em { color: var(--accent); }
+.contact p { color: var(--muted); max-width: 52ch; margin: 20px 0 32px; }
+.email-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.email {
+  font-family: var(--font-mono); font-size: clamp(1rem, 2.4vw, 1.3rem); text-decoration: none;
+  border-bottom: 1px solid var(--accent); padding-bottom: 2px;
+}
+.socials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+
+footer { padding: 32px 0 48px; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 0.9rem; z-index: 100;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+
+/* Talks */
+.talks { list-style: none; margin: 0; padding: 0; }
+.talks-title { font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 56px 0 6px; }
+.talk { display: grid; grid-template-columns: 120px 1fr; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--line); transition: padding-left .25s ease; }
+.talk:hover { padding-left: 8px; }
+.talk .mono { color: var(--muted); padding-top: 3px; font-variant-numeric: tabular-nums; }
+.talk b { font-weight: 500; display: block; }
+.talk span.where { color: var(--muted); font-size: 0.95rem; }
+@media (max-width: 560px) { .talk { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Education & honours */
+.edu-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 760px; }
+.honours { list-style: none; margin: 0; padding: 0; }
+.honours li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.honours .yr { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); padding-top: 3px; }
+.honours .award { color: var(--accent); font-size: 0.9rem; display: block; }
+.col-title { font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 18px; }
+@media (max-width: 860px) { .edu-grid { grid-template-columns: 1fr; } }
+.skills { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 960px) { .skills { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .skills { grid-template-columns: 1fr; gap: 28px; } }
+
+/* ---------- Motion ---------- */
+/* Page-load sequence: hero lines rise into place */
+@keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.hero h1 .line > span { animation: rise 1s cubic-bezier(.2,.8,.2,1) both; }
+.hero h1 .line:nth-child(2) > span { animation-delay: .12s; }
+.hero h1 .line:nth-child(3) > span { animation-delay: .24s; }
+.hero .eyebrow { animation: fadeUp .8s ease both; }
+.hero .lede { animation: fadeUp .8s ease .45s both; }
+.hero .cta { animation: fadeUp .8s ease .6s both; }
+.hero .stats { animation: fadeUp .8s ease .75s both; }
+
+/* Hero headline */
+.hero-copy { max-width: 900px; }
+.hero h1 { font-size: clamp(3rem, 7.4vw, 6.6rem); }
+@media (min-width: 900px) { .hero h1 .line { white-space: nowrap; } }
+
+/* Impact cases */
+.impact { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.case {
+  position: relative; display: flex; flex-direction: column; gap: 14px; padding: 26px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden;
+  transition: transform .3s ease, border-color .3s ease, background-color .45s ease;
+}
+.case::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); transform: scaleY(0); transform-origin: top; transition: transform .45s ease; }
+.case:hover { transform: translateY(-4px); border-color: var(--accent); }
+.case:hover::before { transform: scaleY(1); }
+.case-metric { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.case-metric b { font-family: var(--font-display); font-weight: 400; font-size: clamp(2.4rem, 4.5vw, 3.2rem); line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.case-metric .mono { color: var(--muted); }
+.case h3 { font-family: var(--font-display); font-size: 1.55rem; line-height: 1.2; }
+.case dl { display: grid; grid-template-columns: 72px 1fr; gap: 8px 14px; margin: 0; font-size: 0.95rem; }
+.case dt { color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; padding-top: 4px; }
+.case dd { margin: 0; color: var(--muted); }
+.case-org { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); color: var(--ink); }
+.impact .case:last-child:nth-child(odd) { grid-column: 1 / -1; }
+@media (max-width: 760px) { .impact { grid-template-columns: 1fr; } }
+
+/* Headline typewriter */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.swap-word { white-space: nowrap; }
+.type-caret { display: inline-block; width: 0.06em; height: 0.82em; margin: 0 -0.03em; position: relative; background: var(--accent); vertical-align: -0.04em; animation: blink 1s steps(1) infinite; }
+.type-caret.busy { animation: none; }
+
+/* Scroll reveals */
+.reveal-init { opacity: 0; transform: translateY(28px); }
+.reveal-init.in {
+  opacity: 1; transform: none;
+  transition: opacity .8s ease var(--d, 0ms), transform .9s cubic-bezier(.2,.8,.2,1) var(--d, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="graph" aria-hidden="true"></canvas>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <div class="wrap">
+    <a href="#top" class="brand">Jasper <span>Koh</span></a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#research">Research</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"></path></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow mono">Computer Science &amp; Business Administration · USC</span>
+      <h1>
+        <span class="sr-only">Building hardware and software, optimising workflows, publishing research.</span>
+        <span class="line" aria-hidden="true"><span>Building <em class="swap-word"><span id="swap">hard</span><span class="type-caret"></span>ware,</em></span></span>
+        <span class="line" aria-hidden="true"><span>optimising workflows,</span></span>
+        <span class="line" aria-hidden="true"><span>publishing research.</span></span>
+      </h1>
+      <p class="lede">I'm <strong>Jasper Koh</strong>, a Computer Science and Business Administration student at USC. I build hardware and software, from classroom IoT sensors to AI systems, and I've led technical projects for clients. I'm passionate about engineering and solving problems, and about the <strong>business and finance world</strong>, where I want to make workflows leaner and more efficient. I'm also passionate about <strong>multidisciplinary research</strong> that brings engineering, education and human behaviour together.</p>
+      <div class="cta">
+        <a class="btn primary" href="#research">View publications <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn" href="Jasper_Koh_CV.pdf">View CV</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>1</b><span class="mono">Published</span></div>
+        <div class="stat"><b>1</b><span class="mono">AERA 2027</span></div>
+        <div class="stat"><b>6</b><span class="mono">Conferences &amp; workshops</span></div>
+        <div class="stat"><b>3</b><span class="mono">Professional roles</span></div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<main>
+  <section class="block" id="about">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">01 / About</span>
+        <h2>An engineer's toolkit with a strategist's questions.</h2>
+      </div>
+      <div class="section-body">
+        <div class="about-grid">
+          <div class="prose reveal">
+            <p>I'm studying Computer Science and Business Administration at the University of Southern California. Before USC, I served in the Republic of Singapore Navy as a communications sergeant and led technical projects for clients at a Singapore venture firm.</p>
+            <p>Most of my research happens at the National Institute of Education, Singapore. I deploy IoT sensors across school sites, run field studies, and help get papers to conferences on time. My work looks at how students' environment and physiology shape the way they learn.</p>
+            <p>I've presented this work in the United States, France, Taiwan and Singapore, and I like problems where the technical answer comes with a real case for why it matters.</p>
+          </div>
+          <div class="dual">
+            <div class="dual-card reveal">
+              <span class="mono">Computer Science</span>
+              <h3>Sensors, AI &amp; software</h3>
+              <p>IoT hardware, computer vision, retrieval-augmented generation and automation in Python, C++ and R.</p>
+            </div>
+            <div class="dual-card reveal">
+              <span class="mono">Business Administration</span>
+              <h3>Business &amp; finance</h3>
+              <p>Drawn to how businesses run and grow: finding where workflows slow down and making them more efficient.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="impact">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">02 / Impact</span>
+        <h2>Problems I've solved</h2>
+      </div>
+      <div class="section-body">
+        <div class="impact">
+          <article class="case reveal">
+            <div class="case-metric"><b>12 hrs</b><span class="mono">saved every week</span></div>
+            <h3>Automating manual reporting</h3>
+            <dl>
+              <dt class="mono">Problem</dt><dd>Reporting across several platforms depended on hours of manual data entry each week, which was slow and error-prone.</dd>
+              <dt class="mono">Action</dt><dd>Rebuilt the legacy workflows as automated pipelines in Python and Excel VBA.</dd>
+              <dt class="mono">Result</dt><dd>12 hours of manual entry removed every week, with more accurate data.</dd>
+            </dl>
+            <span class="case-org mono">Republic of Singapore Navy</span>
+          </article>
+          <article class="case reveal">
+            <div class="case-metric"><b>Dev team</b><span class="mono">managed &amp; overseen</span></div>
+            <h3>Leading developers on RAG solutions</h3>
+            <dl>
+              <dt class="mono">Problem</dt><dd>Orative, Krux's AI start-up building retrieval-augmented generation (RAG) solutions, needed developer work kept on scope and on schedule.</dd>
+              <dt class="mono">Action</dt><dd>Managed and oversaw the developer team's work, coordinating priorities between clients and engineers.</dd>
+              <dt class="mono">Result</dt><dd>RAG solutions built and deployed into client workflows.</dd>
+            </dl>
+            <span class="case-org mono">Krux Ventures (Orative) · Singapore</span>
+          </article>
+          <article class="case reveal">
+            <div class="case-metric"><b>4,000</b><span class="mono">event participants</span></div>
+            <h3>Live leaderboards for a sports event</h3>
+            <dl>
+              <dt class="mono">Problem</dt><dd>A 4,000-member sports event had no way for participants to follow standings as they changed.</dd>
+              <dt class="mono">Action</dt><dd>Designed, built and deployed a dynamic website with real-time leaderboards.</dd>
+              <dt class="mono">Result</dt><dd>Live standings for all 4,000 participants throughout the event.</dd>
+            </dl>
+            <span class="case-org mono">Republic of Singapore Navy</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="research">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">03 / Publications</span>
+        <h2>Research</h2>
+      </div>
+      <div class="section-body">
+        <div>
+        <ol class="pubs">
+          <li class="pub reveal">
+            <div>
+              <div class="pub-meta">
+                <span class="chip press">Accepted</span>
+                <span class="mono">AERA 2027 · Virtual presentation</span>
+              </div>
+              <h3>Preliminary Investigation of Adolescent Stress During Learning Tasks Using Bespoke Electrodermal Sensors in Singapore</h3>
+              <p class="authors">Thien Minh Tuan Nguyen, Nguyen Duc Minh Anh, Kenneth Y. T. Lim, Alan J. H. Tan, Shi Xian Chng &amp; <b>Jasper M. H. Koh</b></p>
+              <p class="venue">2027 AERA Annual Meeting, i-Presentation Gallery · SIG-Learning Environments</p>
+              <p class="abstract">An early study of how adolescents in Singapore experience stress while working on learning tasks, measured with custom-built electrodermal activity sensors.</p>
+              <div class="tags" style="margin-top:14px"><span>Learning environments</span><span>Teacher research in learning spaces</span><span>Electrodermal activity</span><span>Bespoke sensors</span></div>
+              <div class="pub-actions">
+                <button class="link-btn" type="button" data-bib="bib-2" aria-expanded="false">BibTeX</button>
+                <button class="link-btn" type="button" data-copy="bib-2">Copy citation</button>
+              </div>
+<pre class="bib" id="bib-2">@inproceedings{nguyen2027adolescent,
+  title        = {Preliminary Investigation of Adolescent Stress During Learning
+                  Tasks Using Bespoke Electrodermal Sensors in Singapore},
+  author       = {{Thien Minh Tuan Nguyen} and {Nguyen Duc Minh Anh} and
+                  Lim, Kenneth Y. T. and Tan, Alan J. H. and Chng, Shi Xian and
+                  Koh, Jasper M. H.},
+  booktitle    = {2027 AERA Annual Meeting},
+  organization = {American Educational Research Association},
+  note         = {Accepted. Virtual presentation, i-Presentation Gallery,
+                  SIG-Learning Environments},
+  year         = {2027}
+}</pre>
+            </div>
+          </li>
+          <li class="pub reveal">
+            <div>
+              <div class="pub-meta">
+                <span class="chip published">Published</span>
+                <span class="mono">July 2023 · First author</span>
+              </div>
+              <h3>Development of an Automated Microclimate Adjustment System based on Concentration Levels of Students</h3>
+              <p class="authors"><b>J. Koh</b>, P. Thangaraja &amp; K. Y. T. Lim</p>
+              <p class="venue">14th International Conference on Applied Human Factors and Ergonomics (AHFE 2023), San Francisco · Cognitive Computing and Internet of Things</p>
+              <p class="abstract">A classroom system that uses computer vision and machine learning to gauge how well students are concentrating, then adjusts the room's microclimate to match. A NodeMCU microcontroller drives the air conditioner through infrared codes, making full use of its modes to keep students comfortable while saving energy.</p>
+              <div class="tags" style="margin-top:14px"><span>Computer vision</span><span>Machine learning</span><span>Facial recognition</span><span>Microcontrollers</span><span>Thermal comfort</span><span>Air quality</span></div>
+              <div class="pub-actions">
+                <a class="link-btn" href="https://doi.org/10.54941/ahfe1003980">DOI: 10.54941/ahfe1003980 ↗</a>
+                <button class="link-btn" type="button" data-bib="bib-1" aria-expanded="false">BibTeX</button>
+                <button class="link-btn" type="button" data-copy="bib-1">Copy citation</button>
+              </div>
+<pre class="bib" id="bib-1">@inproceedings{koh2023microclimate,
+  title     = {Development of an Automated Microclimate Adjustment
+               System based on Concentration Levels of Students},
+  author    = {Koh, Jasper and Thangaraja, Prasanna and Lim, Kenneth Y. T.},
+  booktitle = {Cognitive Computing and Internet of Things},
+  series    = {AHFE International Conference Proceedings},
+  publisher = {AHFE Open Access},
+  year      = {2023},
+  doi       = {10.54941/ahfe1003980}
+}</pre>
+            </div>
+          </li>
+        </ol>
+
+        <h3 class="talks-title reveal">Conferences &amp; workshops</h3>
+        <ul class="talks" style="margin-top:0">
+          <li class="talk reveal"><span class="mono">Oct 2026</span><div><b>Marvelous Education Symposium &amp; Expo 2026, mEducation Alliance</b><span class="where">Assistant to the lead researcher · George Mason University, Arlington, VA, and the World Bank, Washington, D.C. Networked with NGOs and global organisations, including the World Bank, to take our research findings into real-world use.</span></div></li>
+          <li class="talk reveal"><span class="mono">Sep 2026</span><div><b>The UNESCO AI competency frameworks in practice: Adaptation, implementation and validation</b><span class="where">Co-presenter, Parallel Session 4.2 · UNESCO Digital Learning Week 2026, Paris, France</span></div></li>
+          <li class="talk reveal"><span class="mono">Jun 2026</span><div><b>Conducted Micro:bit and AI workshops for high school students</b><span class="where">Workshop facilitator · National Tsing Hua University, Hsinchu, Taiwan</span></div></li>
+          <li class="talk reveal"><span class="mono">Jul 2023</span><div><b>Automated microclimate adjustment based on student concentration</b><span class="where">Presenter · AHFE 2023, San Francisco, CA</span></div></li>
+          <li class="talk reveal"><span class="mono">Mar 2023</span><div><b>Learning at the intersection of AI, physiology, EEG, our environment and well-being (the Life2Well Project)</b><span class="where">Co-facilitator · UNESCO ESD-Net Learning Webinar</span></div></li>
+          <li class="talk reveal"><span class="mono">2019</span><div><b>20th International Elementz Science Research Conference &amp; Exhibition</b><span class="where">Singapore</span></div></li>
+        </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="experience">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">04 / Experience</span>
+        <h2>Experience</h2>
+      </div>
+      <div class="section-body">
+        <ol class="timeline">
+          <li class="tl-item reveal">
+            <div class="tl-head"><h3>Research Assistant</h3><span class="mono">Jan 2026 – Present</span></div>
+            <p class="tl-org">National Institute of Education, Singapore</p>
+            <ul>
+              <li>Lead the lab's research operations, directing a team of research assistants so papers reach conferences on time.</li>
+              <li>Deploy and manage IoT sensors across multiple school sites to collect data for longitudinal pilot studies.</li>
+              <li>Plan and run technology workshops for educators in Singapore; gave an invited presentation at National Tsing Hua University, Taiwan.</li>
+              <li>Act as primary liaison for local and international academic partners and manage the lead researcher's scheduling and logistics.</li>
+              <li>Troubleshoot hardware and software live during field-based and game-based learning studies.</li>
+            </ul>
+          </li>
+          <li class="tl-item reveal">
+            <div class="tl-head"><h3>Operations Associate / Technical Project Lead</h3><span class="mono">Aug 2025 – Jun 2026</span></div>
+            <p class="tl-org">Krux Ventures Pte Ltd (Orative) · Singapore</p>
+            <ul>
+              <li>Delivered technical solutions for clients end to end, managing stakeholders, timelines, software contractors and logistics.</li>
+              <li>Managed and oversaw a team of developers at Orative, Krux's AI start-up specialising in retrieval-augmented generation (RAG) solutions.</li>
+              <li>Designed and deployed a RAG architecture using RAGFlow and proprietary software for client workflows.</li>
+              <li>Maintained backend databases in RStudio and improved Python scripts to streamline daily operations.</li>
+              <li>Organised company publicity events, from product launches to public showcases.</li>
+            </ul>
+          </li>
+          <li class="tl-item reveal">
+            <div class="tl-head"><h3>Communications Specialist (Sergeant)</h3><span class="mono">Jan 2024 – Nov 2025</span></div>
+            <p class="tl-org">Republic of Singapore Navy</p>
+            <ul>
+              <li>Led a crew of 6 maintaining mission-critical communication infrastructure.</li>
+              <li>Built and deployed a website with real-time leaderboards for a 4,000-member sports event.</li>
+              <li>Automated legacy reporting with Python and Excel VBA, cutting manual data entry by 12 hours a week.</li>
+              <li>Ran logistics for a unit-wide cohesion event.</li>
+              <li>Earned the highest performance rating, "Outstanding", for national service.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">05 / Projects</span>
+        <h2>Selected work</h2>
+      </div>
+      <div class="section-body">
+        <div class="projects">
+          <a class="project reveal" href="#research">
+            <span class="mono">Wearables · Research</span>
+            <h3>Bespoke electrodermal sensors</h3>
+            <p>Custom sensors that measure adolescents' stress responses during learning tasks. The study is accepted for AERA 2027.</p>
+            <div class="tags"><span>Electronics</span><span>IoT</span><span>Data collection</span></div>
+          </a>
+          <a class="project reveal" href="https://doi.org/10.54941/ahfe1003980">
+            <span class="mono">Computer vision · IoT</span>
+            <h3>Concentration-aware classroom climate</h3>
+            <p>Estimates student concentration from video and adjusts the air conditioning through a NodeMCU infrared controller. Published at AHFE 2023.</p>
+            <div class="tags"><span>Python</span><span>Machine learning</span><span>NodeMCU</span></div>
+          </a>
+          <a class="project reveal" href="#experience">
+            <span class="mono">Applied AI</span>
+            <h3>RAG solutions for client workflows</h3>
+            <p>Retrieval-augmented generation systems built on RAGFlow and proprietary software, tailored to each client's workflows.</p>
+            <div class="tags"><span>RAGFlow</span><span>LLMs</span><span>Python</span></div>
+          </a>
+          <a class="project reveal" href="#experience">
+            <span class="mono">Web · Automation</span>
+            <h3>Live leaderboards &amp; reporting automation</h3>
+            <p>A real-time leaderboard site for a 4,000-member Navy sports event, plus Python and VBA scripts that saved 12 hours of data entry a week.</p>
+            <div class="tags"><span>HTML/CSS</span><span>Python</span><span>Excel VBA</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="education">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">06 / Education</span>
+        <h2>Education</h2>
+      </div>
+      <div class="section-body">
+        <div class="edu-grid">
+          <ol class="timeline">
+            <li class="tl-item reveal">
+              <div class="tl-head"><h3>University of Southern California</h3><span class="mono">Aug 2026 – May 2030</span></div>
+              <p class="tl-org">B.S. Computer Science / Business Administration · Los Angeles, CA</p>
+              <ul><li>Ultimate Frisbee; Singapore Malaysia Student Association (SMSA)</li></ul>
+            </li>
+            <li class="tl-item reveal">
+              <div class="tl-head"><h3>St. Joseph's Institution</h3><span class="mono">2022 – 2023</span></div>
+              <p class="tl-org">International Baccalaureate Diploma Programme · Singapore</p>
+              <ul><li>Class Chairperson</li><li>Ultimate Frisbee; Beacon community service group; Coding and Technology</li></ul>
+            </li>
+            <li class="tl-item reveal">
+              <div class="tl-head"><h3>School of Science and Technology</h3><span class="mono">2018 – 2021</span></div>
+              <p class="tl-org">GCE O-Level · Singapore</p>
+              <ul><li>Student Councillor; Badminton Vice-Captain; Class Vice-Chairperson</li><li>Edusave Scholarship for Independent Schools (top 10% of cohort), 2020</li></ul>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="skills">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="mono">07 / Skills</span>
+        <h2>Toolkit</h2>
+      </div>
+      <div class="section-body">
+        <div class="skills">
+          <div class="reveal">
+            <h3>Engineering</h3>
+            <ul><li>Python, C++, R</li><li>HTML &amp; CSS</li><li>Electronics &amp; IoT sensors</li><li>RAG systems (RAGFlow)</li><li>Excel VBA automation</li></ul>
+          </div>
+          <div class="reveal">
+            <h3>Research</h3>
+            <ul><li>Field &amp; school-site studies</li><li>Sensor data collection</li><li>Academic writing</li><li>Conference presentation</li><li>Educator workshops</li></ul>
+          </div>
+          <div class="reveal">
+            <h3>Business</h3>
+            <ul><li>Client project delivery</li><li>Stakeholder management</li><li>Operations &amp; logistics</li><li>Team leadership</li><li>Event organisation</li></ul>
+          </div>
+          <div class="reveal">
+            <h3>Languages</h3>
+            <ul><li>English (native)</li><li>Mandarin (fluent)</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block contact" id="contact">
+    <div class="wrap">
+      <span class="mono eyebrow reveal">08 / Contact</span>
+      <h2 class="reveal" style="margin-top:20px"><span class="sr-only">Let's work on something rigorous, impactful and efficient.</span><span aria-hidden="true">Let's work on something <em class="swap-word"><span id="swap2">rigorous</span><span class="type-caret" id="caret2"></span>.</em></span></h2>
+      <p class="reveal">Let's have a chat! Whether it's an internship, a research collaboration or an idea for a more efficient workflow, I'd love to hear from you.</p>
+      <div class="email-row reveal">
+        <a class="email" href="mailto:kohjasperr@gmail.com">kohjasperr@gmail.com</a>
+        <button class="link-btn" type="button" id="copy-email">Copy email</button>
+      </div>
+      <div class="socials reveal">
+        <a class="btn" href="https://www.linkedin.com/in/jasperkoh/">LinkedIn <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="btn" href="https://github.com/kohjasper/">GitHub <span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="btn primary" href="Jasper_Koh_CV.pdf">View CV <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap mono">
+    <span>© 2026 Jasper Koh</span>
+    <span>Los Angeles · Singapore</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Theme: dark by default, remembered per browser ---------- */
+  var toggle = document.getElementById('theme-toggle');
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    toggle.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    try { localStorage.setItem('jk-theme', t); } catch (e) {}
+    readColors();
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('jk-theme'); } catch (e) {}
+  root.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+  toggle.addEventListener('click', function () {
+    setTheme(root.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+  });
+
+  /* ---------- Nav ---------- */
+  var nav = document.getElementById('nav');
+  var links = document.getElementById('nav-links');
+  var menuBtn = document.getElementById('menu-btn');
+  window.addEventListener('scroll', function () { nav.classList.toggle('scrolled', window.scrollY > 8); }, { passive: true });
+  menuBtn.addEventListener('click', function () {
+    var open = links.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', String(open));
+  });
+  links.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') { links.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); }
+  });
+  if ('IntersectionObserver' in window) {
+    var navAnchors = Array.prototype.slice.call(links.querySelectorAll('a'));
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          navAnchors.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id); });
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    ['about', 'impact', 'research', 'experience', 'projects', 'education', 'contact'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) io.observe(el);
+    });
+  }
+
+  /* ---------- Toast + copy helpers ---------- */
+  var toast = document.getElementById('toast'), toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+  }
+  function copy(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { showToast(okMsg); }, function () { showToast('Copying is blocked here. Select the text instead.'); });
+    } else { showToast('Copying is blocked here. Select the text instead.'); }
+  }
+  document.querySelectorAll('[data-bib]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = document.getElementById(b.getAttribute('data-bib'));
+      var open = el.classList.toggle('open');
+      b.setAttribute('aria-expanded', String(open));
+    });
+  });
+  document.querySelectorAll('[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () { copy(document.getElementById(b.getAttribute('data-copy')).textContent, 'BibTeX copied'); });
+  });
+  document.getElementById('copy-email').addEventListener('click', function () { copy('kohjasperr@gmail.com', 'Email copied'); });
+
+  /* ---------- Project card spotlight ---------- */
+  document.querySelectorAll('.project').forEach(function (card) {
+    card.addEventListener('pointermove', function (e) {
+      var r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+
+  /* ---------- Hero: drifting citation graph ---------- */
+  var canvas = document.getElementById('graph');
+  var ctx = canvas.getContext('2d');
+  var W = 0, H = 0, dpr = 1, nodes = [], colors = { accent: '#E3A857', ink: '#E9E6DE', line: '#252C36' };
+  var mouse = { x: -9999, y: -9999 };
+
+  function readColors() {
+    var cs = getComputedStyle(root);
+    colors.accent = cs.getPropertyValue('--accent').trim();
+    colors.ink = cs.getPropertyValue('--muted').trim();
+    colors.line = cs.getPropertyValue('--line').trim();
+    if (reduced) draw();
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var count = Math.round(Math.min(90, Math.max(28, W * H / 16000)));
+    nodes = [];
+    for (var i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+        r: Math.random() < 0.12 ? 3.2 : 1.6 + Math.random(),
+        key: Math.random() < 0.12
+      });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    var maxD = 130;
+    for (var i = 0; i < nodes.length; i++) {
+      var a = nodes[i];
+      for (var j = i + 1; j < nodes.length; j++) {
+        var b = nodes[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < maxD) {
+          var near = (Math.hypot(a.x - mouse.x, a.y - mouse.y) < 160);
+          ctx.globalAlpha = (1 - d / maxD) * (near ? 0.55 : 0.22);
+          ctx.strokeStyle = near || a.key || b.key ? colors.accent : colors.ink;
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+    }
+    for (var k = 0; k < nodes.length; k++) {
+      var n = nodes[k];
+      ctx.globalAlpha = n.key ? 0.95 : 0.5;
+      ctx.fillStyle = n.key ? colors.accent : colors.ink;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+  function step() {
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      var dx = mouse.x - n.x, dy = mouse.y - n.y, d = Math.hypot(dx, dy);
+      if (d < 160 && d > 1) { n.vx += dx / d * 0.012; n.vy += dy / d * 0.012; }
+      n.vx *= 0.99; n.vy *= 0.99;
+      if (Math.abs(n.vx) < 0.05) n.vx += (Math.random() - 0.5) * 0.02;
+      if (Math.abs(n.vy) < 0.05) n.vy += (Math.random() - 0.5) * 0.02;
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W) n.vx *= -1;
+      if (n.y < 0 || n.y > H) n.vy *= -1;
+    }
+    draw();
+  }
+  var visible = true;
+  function loop() { if (visible) step(); requestAnimationFrame(loop); }
+  window.addEventListener('pointermove', function (e) { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+  document.addEventListener('pointerleave', function () { mouse.x = mouse.y = -9999; });
+  document.addEventListener('visibilitychange', function () { visible = document.visibilityState === 'visible'; });
+  // Parallax: the network drifts as the page scrolls, wrapping at the edges
+  var lastScroll = window.scrollY;
+  window.addEventListener('scroll', function () {
+    var dy = (window.scrollY - lastScroll) * 0.25; lastScroll = window.scrollY;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i]; n.y -= dy * (n.key ? 1.4 : 1);
+      if (n.y < -20) n.y += H + 40; else if (n.y > H + 20) n.y -= H + 40;
+    }
+    if (reduced) draw();
+  }, { passive: true });
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { resize(); draw(); }, 150); });
+
+  readColors(); resize(); draw();
+  if (!reduced) requestAnimationFrame(loop);
+
+  /* ---------- Typewriters: delete a word, type the next, loop ---------- */
+  function typewriter(el, caret, words, firstDelay, hold) {
+    if (!el || !caret || reduced) return;
+    var wi = 0;
+    function typeTo(word, k) {
+      el.textContent = word.slice(0, k);
+      if (k < word.length) setTimeout(function () { typeTo(word, k + 1); }, 110);
+      else { caret.classList.remove('busy'); setTimeout(erase, hold); }
+    }
+    function erase() {
+      caret.classList.add('busy');
+      var t = el.textContent;
+      if (t.length) { el.textContent = t.slice(0, -1); setTimeout(erase, 60); }
+      else { wi = (wi + 1) % words.length; setTimeout(function () { typeTo(words[wi], 1); }, 260); }
+    }
+    setTimeout(erase, firstDelay);
+  }
+  typewriter(document.getElementById('swap'), document.querySelector('.hero .type-caret'), ['hard', 'soft'], 2600, 2200);
+  typewriter(document.getElementById('swap2'), document.getElementById('caret2'), ['rigorous', 'impactful', 'efficient'], 2400, 2000);
+
+  /* ---------- Scroll reveals ---------- */
+  if (!reduced && 'IntersectionObserver' in window) {
+    var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+    var vh = window.innerHeight;
+    var ro = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target;
+        el.classList.add('in');
+        ro.unobserve(el);
+        var delay = parseInt(el.style.getPropertyValue('--d') || '0', 10);
+        setTimeout(function () { el.classList.remove('reveal-init', 'in'); el.style.removeProperty('--d'); }, 1000 + delay);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    revealEls.forEach(function (el) {
+      if (el.getBoundingClientRect().top < vh * 0.95) return; // already on screen: leave it visible
+      var sibs = Array.prototype.filter.call(el.parentElement.children, function (c) { return c.classList.contains('reveal'); });
+      el.style.setProperty('--d', Math.min(sibs.indexOf(el), 5) * 90 + 'ms');
+      el.classList.add('reveal-init');
+      ro.observe(el);
+    });
+  }
+})();
+</script>
+</body>
+</html>
